@@ -56,7 +56,7 @@ export default function CartSheet() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="text-sm font-medium">{item.title}</p>
-                      {item.size ? <p className="text-xs opacity-70">Tamanho: {item.size}</p> : null}
+                      
                       <p className="text-sm font-semibold mt-1">R$ {(item.price * item.qty).toFixed(2)}</p>
                     </div>
                     <button

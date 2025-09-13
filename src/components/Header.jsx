@@ -1,16 +1,16 @@
-import {  useState } from "react";
+import { useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { IoCartOutline } from "react-icons/io5";
 import { IoMdSearch } from "react-icons/io";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import { useCartUI } from "@/stores/cart-ui";
 import CartButton from "@/components/CartButton";
-
+import SearchProductsInput from "@/components/SearchProductsInput";
 
 const links = [
   { label: "Home", to: "/" },
   { label: "Produtos", to: "#produtos" }, // seção na home
-  { label: "Contato", to: "#contato" },   // seção na home
+  { label: "Contato", to: "#contato" }, // seção na home
 ];
 
 export default function Header() {
@@ -26,7 +26,6 @@ export default function Header() {
     el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
- 
   const handleSectionNav = async (hash) => {
     const id = hash.replace("#", "");
     if (pathname !== "/") {
@@ -40,35 +39,28 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white text-gray-900 dark:bg-zinc-900 dark:text-white">
-    
       <div className="flex justify-center items-center bg-black text-white text-sm py-2 px-3">
         <p className="text-center text-xs">
-          Liquidação de verão para todos os trajes de banho e entrega expressa grátis — <b>50% DE DESCONTO</b>!
-          <Link to="/sale" className="underline ml-1">Shop Now</Link>
+          Liquidação de verão para todos os trajes de banho e entrega expressa
+          grátis — <b>50% DE DESCONTO</b>!
+          <Link to="/" className="underline ml-1">
+            Shop Now
+          </Link>
         </p>
       </div>
 
-     
       <nav className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex h-16 items-center justify-between">
-        
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold tracking-tight">Look Horizon</span>
+            <span className="text-2xl font-bold tracking-tight">
+              Look Horizon
+            </span>
           </Link>
 
-        
           <div className="hidden md:flex items-center flex-1 max-w-md mx-6">
-            <div className="relative w-full">
-              <IoMdSearch className="absolute left-3 top-1/2 -translate-y-1/2 opacity-70" />
-              <input
-                type="search"
-                placeholder="Buscar produtos…"
-                className="w-full rounded-md border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 pl-10 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#00ADB5]"
-              />
-            </div>
+            <SearchProductsInput />
           </div>
 
-         
           <div className="hidden md:flex items-center gap-6">
             <ul className="flex items-center gap-6 text-sm">
               {links.map((l) => (
@@ -84,7 +76,11 @@ export default function Header() {
                     <NavLink
                       to={l.to}
                       className={({ isActive }) =>
-                        `transition-colors ${isActive ? "text-[#00ADB5] font-medium" : "hover:text-[#00ADB5]"}`
+                        `transition-colors ${
+                          isActive
+                            ? "text-[#00ADB5] font-medium"
+                            : "hover:text-[#00ADB5]"
+                        }`
                       }
                     >
                       {l.label}
@@ -95,14 +91,12 @@ export default function Header() {
             </ul>
 
             <div className="flex items-center gap-3">
-              
-                 <CartButton />
-           
+              <CartButton />
             </div>
           </div>
 
-      
           <div className="md:hidden flex items-center gap-1">
+          
             <button
               aria-label="Carrinho"
               className="relative inline-flex items-center rounded-md px-1 py-2 hover:bg-black/5 dark:hover:bg_white/5"
@@ -115,13 +109,16 @@ export default function Header() {
               aria-label={open ? "Fechar menu" : "Abrir menu"}
               onClick={() => setOpen((s) => !s)}
             >
-              {open ? <HiOutlineX className="size-6" /> : <HiOutlineMenu className="size-6" />}
+              {open ? (
+                <HiOutlineX className="size-6" />
+              ) : (
+                <HiOutlineMenu className="size-6" />
+              )}
             </button>
           </div>
         </div>
       </nav>
 
-     
       <div
         className={`md:hidden transition-[max-height] duration-300 overflow-hidden border-t border-gray-100 dark:border-zinc-800 ${
           open ? "max-h-96" : "max-h-0"
@@ -129,6 +126,9 @@ export default function Header() {
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-3">
           <ul className="flex flex-col gap-2">
+              <div className="md:hidden pb-3">
+            <SearchProductsInput />
+          </div>
             {links.map((l) => (
               <li key={l.label}>
                 {l.to.startsWith("#") ? (
@@ -151,17 +151,7 @@ export default function Header() {
             ))}
           </ul>
 
-        
-          <div className="md:hidden pb-3">
-            <div className="relative">
-              <IoMdSearch className="absolute left-3 top-1/2 -translate-y-1/2 opacity-70" />
-              <input
-                type="search"
-                placeholder="Buscar produtos…"
-                className="w-full rounded-md border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 pl-10 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#00ADB5]"
-              />
-            </div>
-          </div>
+          
         </div>
       </div>
     </header>
