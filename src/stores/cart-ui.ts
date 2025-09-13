@@ -1,16 +1,23 @@
-// src/stores/cart-ui.ts
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 type CartUIState = {
   open: boolean;
+  setOpen: (v: boolean) => void;
   openCart: () => void;
   closeCart: () => void;
-  toggle: () => void;
+  toggleCart: () => void;
 };
 
-export const useCartUI = create<CartUIState>((set) => ({
-  open: false,
-  openCart: () => set({ open: true }),
-  closeCart: () => set({ open: false }),
-  toggle: () => set((s) => ({ open: !s.open })),
-}));
+export const useCartUI = create<CartUIState>()(
+  persist(
+    (set, get) => ({
+      open: false,
+      setOpen: (v) => set({ open: v }),
+      openCart: () => set({ open: true }),
+      closeCart: () => set({ open: false }),
+      toggleCart: () => set({ open: !get().open }),
+    }),
+    { name: "cart-ui" }
+  )
+);

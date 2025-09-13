@@ -4,95 +4,108 @@ import {
   SheetHeader,
   SheetTitle,
   SheetFooter,
+  SheetDescription,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useCart } from "@/stores/cart-store";
+import { useCartUI } from "@/stores/cart-ui";
+import { X, Minus, Plus, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-export default function CartSheet({ open, onOpenChange }) {
-  // mock de produtos do carrinho
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      title: "Camiseta Básica",
-      price: 59.9,
-      image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200",
-      qty: 1,
-    },
-    {
-      id: 2,
-      title: "Tênis Esportivo",
-      price: 249.9,
-      image:
-        "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9d3?w=200",
-      qty: 2,
-    },
-  ]);
 
-  const subtotal = items.reduce((acc, i) => acc + i.price * i.qty, 0);
+export default function CartSheet() {
+  const navigate = useNavigate(); 
+  const open = useCartUI((s) => s.open);
+  const setOpen = useCartUI((s) => s.setOpen);
+
+  const items = useCart((s) => s.items);
+  const inc = useCart((s) => s.inc);
+  const dec = useCart((s) => s.dec);
+  const remove = useCart((s) => s.remove);
+  const clear = useCart((s) => s.clear);
+  const subtotal = useCart((s) => s.subtotal());
+
+  function goToCheckout() {                      
+    setOpen(false);                            
+    navigate("/checkout");                     
+  }
+
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>Carrinho</SheetTitle>
-        </SheetHeader>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetContent side="right" className="w-full sm:max-w-md px-2">
+        <div className="flex items-center justify-between">
+          <SheetHeader className="mb-2">
+            <SheetTitle>Seu carrinho</SheetTitle>
+            <SheetDescription>Revise os itens antes de finalizar a compra.</SheetDescription>
+          </SheetHeader>
+        </div>
 
-        <div className="mt-6 space-y-4">
-          {items.map((item, index) => (
-            <div
-              key={item.id}
-              className="flex items-center gap-4 border rounded-md p-2"
-            >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-16 h-16 object-contain"
-              />
-              <div className="flex-1">
-                <p className="text-sm font-medium line-clamp-1">{item.title}</p>
-                <p className="text-xs text-gray-500">Qtd: {item.qty}</p>
+        <div className="mt-2 space-y-4 overflow-y-auto max-h-[60vh] px-5 border rounded-2xl py-2">
+          {items.length === 0 ? (
+            <p className="text-sm opacity-70">Seu carrinho está vazio.</p>
+          ) : (
+            items.map((item) => (
+              <div key={`${item.id}-${item.size ?? ""}`} className="flex py-2 gap-3 ">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="h-16 w-16 rounded-md object-container border"
+                />
+                <div className="flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-medium">{item.title}</p>
+                      {item.size ? <p className="text-xs opacity-70">Tamanho: {item.size}</p> : null}
+                      <p className="text-sm font-semibold mt-1">R$ {(item.price * item.qty).toFixed(2)}</p>
+                    </div>
+                    <button
+                      aria-label="Remover item"
+                      className="rounded-md p-1 hover:bg-black/5 dark:hover:bg-white/5"
+                      onClick={() => remove(item.id, item.size)}
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                   
+                  </div>
+
+                  <div className="mt-2 inline-flex items-center rounded-md border">
+                    <button
+                      className="px-2 py-1 hover:bg-black/5 dark:hover:bg-white/5"
+                      onClick={() => dec(item.id, item.size)}
+                      aria-label="Diminuir quantidade"
+                    >
+                      <Minus className="size-4" />
+                    </button>
+                    <span className="px-3 text-sm tabular-nums">{item.qty}</span>
+                    <button
+                      className="px-2 py-1 hover:bg-black/5 dark:hover:bg-white/5"
+                      onClick={() => inc(item.id, item.size)}
+                      aria-label="Aumentar quantidade"
+                    >
+                      <Plus className="size-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() =>
-                    setItems((prev) =>
-                      prev.map((it, i) =>
-                        i === index
-                          ? { ...it, qty: Math.max(1, it.qty - 1) }
-                          : it
-                      )
-                    )
-                  }
-                >
-                  -
-                </button>
-                <button
-                  onClick={() =>
-                    setItems((prev) =>
-                      prev.map((it, i) =>
-                        i === index ? { ...it, qty: it.qty + 1 } : it
-                      )
-                    )
-                  }
-                >
-                  +
-                </button>
-              </div>
-              <span className="text-sm font-semibold">
-                R$ {(item.price * item.qty).toFixed(2)}
-              </span>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         <SheetFooter className="mt-6">
           <div className="w-full space-y-4">
-            <div className="flex justify-between text-sm">
+            <div className="flex items-center justify-between text-sm">
               <span>Subtotal</span>
               <span className="font-bold">R$ {subtotal.toFixed(2)}</span>
             </div>
-            <Button className="w-full">Finalizar Compra</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" className="w-1/3" onClick={clear} disabled={items.length === 0}>
+                Limpar
+              </Button>
+              <Button onClick={goToCheckout} className="w-2/3" disabled={items.length === 0}>
+                Finalizar compra
+              </Button>
+            </div>
           </div>
         </SheetFooter>
       </SheetContent>

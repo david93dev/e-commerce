@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import HeaderProductPage from "@/components/HeaderProductPage";
 import ProductList from "@/components/Products";
+import AddToCartButton from "@/components/AddToCartButton";
+import { toast } from "sonner"
+
+
+const sizes = ["P", "M", "G", "GG"];
 
 const Product = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -14,8 +19,11 @@ const Product = () => {
         const res = await fetch(`https://fakestoreapi.com/products/${id}`);
         const data = await res.json();
         setProduct(data);
+        setSelectedSize(null); // reset ao trocar de produto
       } catch (error) {
-        console.error("Erro ao carregar produto:", error);
+
+        toast.error("Erro ao carregar produto", error)
+        
       }
     };
 
@@ -30,16 +38,20 @@ const Product = () => {
     );
   }
 
+  const priceBRL = Number(product.price).toFixed(2);
+
   return (
-    <div className=" bg-[#f7f7f8]">
+    <div className="bg-[#f7f7f8]">
       <HeaderProductPage />
       <div className="flex flex-col justify-center items-center">
-        <div className="mb-20 mt-8 w-7xl" >
-            <h1 className="scroll-m-20 text-left text-4xl font-extrabold tracking-tight text-balance">
-          Detalhes do produto
-        </h1>
+        <div className="mb-20 mt-8 w-7xl">
+          <h1 className="scroll-m-20 text-left text-4xl font-extrabold tracking-tight text-balance">
+            Detalhes do produto
+          </h1>
         </div>
+
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-20 mb-20 px-5">
+          {/* Imagem */}
           <div className="flex items-center justify-center">
             <img
               src={product.image}
@@ -48,44 +60,74 @@ const Product = () => {
             />
           </div>
 
+          {/* Infos */}
           <div className="flex flex-col justify-between max-w-sm">
             <div>
               <h1 className="text-2xl font-bold text-gray-800 mb-4">
                 {product.title}
               </h1>
+
               <p className="text-gray-600 mb-4">{product.description}</p>
 
               <p className="text-lg font-semibold text-gray-700 mb-2">
-                Categoria:{" "}
-                <span className="capitalize">{product.category}</span>
+                Categoria: <span className="capitalize">{product.category}</span>
               </p>
 
               <p className="text-2xl font-bold text-green-600 mb-6">
-                R$ {product.price}
+                R$ {priceBRL}
               </p>
 
+              {/* Tamanhos */}
               <div className="mb-6">
-                <span className="text-sm text-gray-500 block mb-2">
-                  Tamanho
-                </span>
+                <span className="text-sm text-gray-500 block mb-2">Tamanho</span>
                 <div className="flex gap-2">
-                  {["P", "M", "G", "GG"].map((size) => (
-                    <button
-                      key={size}
-                      className="px-3 py-1 border rounded hover:bg-gray-100 text-sm"
-                    >
-                      {size}
-                    </button>
-                  ))}
+                  {sizes.map((size) => {
+                    const active = selectedSize === size;
+                    return (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => setSelectedSize(size)}
+                        className={[
+                          "px-3 py-1 border rounded text-sm transition",
+                          active
+                            ? "bg-black text-white border-black"
+                            : "hover:bg-gray-100",
+                        ].join(" ")}
+                        aria-pressed={active}
+                        aria-label={`Selecionar tamanho ${size}`}
+                      >
+                        {size}
+                      </button>
+                    );
+                  })}
                 </div>
+                {/* dica de validação */}
+                {!selectedSize && (
+                  <p className="mt-2 text-xs text-gray-500">
+                    Selecione um tamanho antes de adicionar ao carrinho.
+                  </p>
+                )}
               </div>
             </div>
 
-            <Button className="w-full md:w-auto">Adicionar ao Carrinho</Button>
+            {/* Adicionar ao carrinho */}
+            <AddToCartButton
+              product={{
+                id: product.id,
+                title: product.title,
+                image: product.image,
+                price: Number(product.price),
+              }}
+              size={selectedSize} // será salvo junto ao item no carrinho
+              qty={1}
+              openOnAdd={true}
+            />
           </div>
         </div>
       </div>
-      <ProductList title={'Outros Produtos'} />
+
+      <ProductList title={"Outros Produtos"} />
     </div>
   );
 };

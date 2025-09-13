@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom"; 
+import { toast } from "sonner"
 
 
 const ProductList = ({ title }) => {
@@ -22,7 +23,7 @@ const ProductList = ({ title }) => {
         setAllProducts({ men, women });
         setProducts([...men, ...women]);
       } catch (error) {
-        console.error("Erro ao carregar produtos:", error);
+        toast.error("Erro ao carregar produtos:", error)
       }
     };
 

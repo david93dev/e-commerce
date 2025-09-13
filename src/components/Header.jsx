@@ -4,7 +4,8 @@ import { IoCartOutline } from "react-icons/io5";
 import { IoMdSearch } from "react-icons/io";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import { useCartUI } from "@/stores/cart-ui";
-import CartSheet from "@/components/CartSheet"
+import CartButton from "@/components/CartButton";
+
 
 const links = [
   { label: "Home", to: "/" },
@@ -41,7 +42,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white text-gray-900 dark:bg-zinc-900 dark:text-white">
     
       <div className="flex justify-center items-center bg-black text-white text-sm py-2 px-3">
-        <p className="text-center text-xs md:text-">
+        <p className="text-center text-xs">
           Liquidação de verão para todos os trajes de banho e entrega expressa grátis — <b>50% DE DESCONTO</b>!
           <Link to="/sale" className="underline ml-1">Shop Now</Link>
         </p>
@@ -94,14 +95,9 @@ export default function Header() {
             </ul>
 
             <div className="flex items-center gap-3">
-              <button
-                aria-label="Carrinho"
-                className="relative hover:scale-110 transition-transform"
-                onClick={openCart}
-              >
-                <IoCartOutline className="size-7" />
-                 <CartSheet />
-              </button>
+              
+                 <CartButton />
+           
             </div>
           </div>
 
